@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/skaisanlahti/advent-of-code-2023/day1/internal/calibrator"
 	"github.com/skaisanlahti/advent-of-code-2023/day1/internal/reader"
@@ -15,6 +16,10 @@ func main() {
 
 	filePath := os.Args[1]
 	input := reader.ReadInputFile(filePath)
+
+	start := time.Now()
 	sum := calibrator.Calibrate(input, true)
-	log.Printf("Calibrated %s: %d", filePath, sum)
+	duration := time.Since(start).Milliseconds()
+
+	log.Printf("Calibrated %s in %d ms with result %d.", filePath, duration, sum)
 }

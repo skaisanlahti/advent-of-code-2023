@@ -6,24 +6,19 @@ import (
 	"strings"
 )
 
-var patterns = map[string]string{
-	"one":   "1",
-	"two":   "2",
-	"three": "3",
-	"four":  "4",
-	"five":  "5",
-	"six":   "6",
-	"seven": "7",
-	"eight": "8",
-	"nine":  "9",
-}
-
 func Calibrate(input []string, checkStrings bool) int {
 	log.Println("Calibration:")
 	log.Println("---")
 	var values []int
 	for _, line := range input {
-		value := findValue(line, checkStrings)
+		firstDigit := findDigit(line, checkStrings, false)
+		lastDigit := findDigit(line, checkStrings, true)
+
+		value, err := strconv.Atoi(firstDigit + lastDigit)
+		if err != nil {
+			log.Panicln(err.Error())
+		}
+
 		values = append(values, value)
 		log.Println(value)
 	}
@@ -38,36 +33,51 @@ func Calibrate(input []string, checkStrings bool) int {
 	return sum
 }
 
-func findValue(line string, checkStrings bool) int {
-	first := findFirstDigit(line, checkStrings)
-	last := findLastDigit(line, checkStrings)
-	value, err := strconv.Atoi(first + last)
-	if err != nil {
-		log.Println(err.Error())
-		return 0
-	}
-	return value
+var patterns = map[string]string{
+	"one":   "1",
+	"two":   "2",
+	"three": "3",
+	"four":  "4",
+	"five":  "5",
+	"six":   "6",
+	"seven": "7",
+	"eight": "8",
+	"nine":  "9",
 }
 
-func findFirstDigit(line string, checkStrings bool) string {
-	results := map[string]int{}
-	for key, value := range patterns {
-		valueIndex := strings.Index(line, value)
-		if valueIndex != -1 {
-			results[value] = valueIndex
+func findDigit(line string, checkStrings bool, reverseOrder bool) string {
+	if reverseOrder {
+		line = reverseString(line)
+	}
+
+	matches := map[string]int{}
+	for index, char := range line {
+		_, err := strconv.Atoi(string(char))
+		if err != nil {
+			continue
 		}
 
+		matches[string(char)] = index
+		break
+	}
+
+	for key := range patterns {
 		if checkStrings {
-			keyIndex := strings.Index(line, key)
+			localKey := key
+			if reverseOrder {
+				localKey = reverseString(key)
+			}
+
+			keyIndex := strings.Index(line, localKey)
 			if keyIndex != -1 {
-				results[key] = keyIndex
+				matches[key] = keyIndex
 			}
 		}
 	}
 
 	firstIndex := len(line)
 	var candidate string
-	for key, value := range results {
+	for key, value := range matches {
 		if value < firstIndex {
 			firstIndex = value
 			candidate = key
@@ -76,52 +86,16 @@ func findFirstDigit(line string, checkStrings bool) string {
 
 	_, err := strconv.Atoi(candidate)
 	if err != nil {
-		conversion, _ := patterns[candidate]
+		conversion, ok := patterns[candidate]
+		if !ok {
+			log.Panicln("Pattern conversion not found.")
+		}
+
 		_, err = strconv.Atoi(conversion)
 		if err != nil {
 			log.Panicln(err)
 		}
-		return conversion
-	}
 
-	return candidate
-}
-
-func findLastDigit(line string, checkStrings bool) string {
-	revLine := reverseString(line)
-	results := map[string]int{}
-	for key, value := range patterns {
-		valueIndex := strings.Index(revLine, value)
-		if valueIndex != -1 {
-			results[value] = valueIndex
-		}
-
-		if checkStrings {
-			revKey := reverseString(key)
-			keyIndex := strings.Index(revLine, revKey)
-			if keyIndex != -1 {
-				results[key] = keyIndex + len(key) - 1
-			}
-		}
-
-	}
-
-	firstIndex := len(line)
-	var candidate string
-	for key, value := range results {
-		if value < firstIndex {
-			firstIndex = value
-			candidate = key
-		}
-	}
-
-	_, err := strconv.Atoi(candidate)
-	if err != nil {
-		conversion, _ := patterns[candidate]
-		_, err = strconv.Atoi(conversion)
-		if err != nil {
-			log.Panicln(err)
-		}
 		return conversion
 	}
 
@@ -133,5 +107,6 @@ func reverseString(s string) string {
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
 		runes[i], runes[j] = runes[j], runes[i]
 	}
+
 	return string(runes)
 }
