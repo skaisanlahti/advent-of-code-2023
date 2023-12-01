@@ -1,4 +1,4 @@
-package calibrator
+package internal
 
 import (
 	"strconv"
@@ -60,9 +60,9 @@ func findDigit(line string, checkStrings bool, reverseOrder bool) string {
 				localKey = reverseString(key)
 			}
 
-			keyIndex := strings.Index(line, localKey)
-			if keyIndex != -1 {
-				matches[key] = keyIndex
+			index := strings.Index(line, localKey)
+			if index != -1 {
+				matches[key] = index
 			}
 		}
 	}
