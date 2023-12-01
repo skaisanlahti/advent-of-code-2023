@@ -1,6 +1,13 @@
 version: "3"
 
 tasks:
+  all:
+    cmds:
+      - task test1
+      - task part1
+      - task test2
+      - task part2
+
   test1:
     cmds:
       - go run cmd/main.go -f=input/testdata1.txt
