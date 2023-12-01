@@ -1,35 +1,27 @@
 package calibrator
 
 import (
-	"log"
 	"strconv"
 	"strings"
 )
 
 func Calibrate(input []string, checkStrings bool) int {
-	log.Println("Calibration:")
-	log.Println("---")
 	var values []int
 	for _, line := range input {
 		firstDigit := findDigit(line, checkStrings, false)
 		lastDigit := findDigit(line, checkStrings, true)
-
 		value, err := strconv.Atoi(firstDigit + lastDigit)
 		if err != nil {
-			log.Panicln(err.Error())
+			panic(err)
 		}
 
 		values = append(values, value)
-		log.Println(value)
 	}
 
 	sum := 0
 	for _, number := range values {
 		sum += number
 	}
-	log.Println("---")
-	log.Printf("=%d", sum)
-	log.Println("---")
 	return sum
 }
 
@@ -88,12 +80,12 @@ func findDigit(line string, checkStrings bool, reverseOrder bool) string {
 	if err != nil {
 		conversion, ok := patterns[candidate]
 		if !ok {
-			log.Panicln("Pattern conversion not found.")
+			panic("Pattern conversion not found.")
 		}
 
 		_, err = strconv.Atoi(conversion)
 		if err != nil {
-			log.Panicln(err)
+			panic(err)
 		}
 
 		return conversion

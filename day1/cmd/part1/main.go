@@ -10,16 +10,16 @@ import (
 )
 
 func main() {
+	start := time.Now()
 	if len(os.Args) < 2 {
-		log.Fatal("Usage: go run cmd/part1/main.go <filepath>")
+		panic("Usage: go run cmd/part1/main.go <filepath>")
 	}
 
 	filePath := os.Args[1]
 	input := reader.ReadInputFile(filePath)
 
-	start := time.Now()
-	sum := calibrator.Calibrate(input, false)
-	duration := time.Since(start).Milliseconds()
+	result := calibrator.Calibrate(input, false)
+	duration := time.Since(start).Nanoseconds()
 
-	log.Printf("Calibrated %s in %d ms with result %d.", filePath, duration, sum)
+	log.Printf("Calibrated %s in %d ns with result %d.", filePath, duration, result)
 }

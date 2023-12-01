@@ -2,14 +2,13 @@ package reader
 
 import (
 	"bufio"
-	"log"
 	"os"
 )
 
 func ReadInputFile(filePath string) []string {
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Fatalf("Error opening file: %v", err)
+		panic(err)
 	}
 	defer file.Close()
 
@@ -20,15 +19,8 @@ func ReadInputFile(filePath string) []string {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatalf("Error reading lines: %v", err)
+		panic(err)
 	}
-
-	log.Println("Input:")
-	log.Println("---")
-	for _, line := range lines {
-		log.Println(line)
-	}
-	log.Println("---")
 
 	return lines
 }
