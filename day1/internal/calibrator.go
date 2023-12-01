@@ -5,27 +5,22 @@ import (
 	"strings"
 )
 
-func Calibrate(input []string, checkStrings bool) int {
-	var values []int
+func Calibrate(input []string, checkStringPatterns bool) int {
+	total := 0
 	for _, line := range input {
-		firstDigit := findDigit(line, checkStrings, false)
-		lastDigit := findDigit(line, checkStrings, true)
-		value, err := strconv.Atoi(firstDigit + lastDigit)
-		if err != nil {
-			panic(err)
+		firstDigit, ok := findDigit(line, checkStringPatterns, false)
+		if !ok {
+			continue // line contains no valid digits, skip checking in reverse order
 		}
-
-		values = append(values, value)
+		lastDigit, _ := findDigit(line, checkStringPatterns, true)
+		value := digitsToValue(firstDigit, lastDigit)
+		total += value
 	}
 
-	sum := 0
-	for _, number := range values {
-		sum += number
-	}
-	return sum
+	return total
 }
 
-var patterns = map[string]string{
+var digits = map[string]string{
 	"one":   "1",
 	"two":   "2",
 	"three": "3",
@@ -37,61 +32,71 @@ var patterns = map[string]string{
 	"nine":  "9",
 }
 
-func findDigit(line string, checkStrings bool, reverseOrder bool) string {
+func findDigit(line string, checkStringPatterns bool, reverseOrder bool) (string, bool) {
+	// find digit either from start or end of line
 	if reverseOrder {
 		line = reverseString(line)
 	}
 
+	// find digit based on number value
 	matches := map[string]int{}
 	for index, char := range line {
-		_, err := strconv.Atoi(string(char))
-		if err != nil {
+		digit := string(char)
+		value, err := strconv.Atoi(digit)
+		if err != nil || value == 0 {
 			continue
 		}
 
-		matches[string(char)] = index
+		// if string patterns are not included in search, we can exit on first valid digit
+		if !checkStringPatterns {
+			return digit, true
+		}
+
+		// save index to compare with string pattern indexes
+		matches[digit] = index
 		break
 	}
 
-	for key := range patterns {
-		if checkStrings {
-			localKey := key
-			if reverseOrder {
-				localKey = reverseString(key)
-			}
+	// find digits with string patterns
+	for key := range digits {
+		pattern := key
+		if reverseOrder {
+			pattern = reverseString(key)
+		}
 
-			index := strings.Index(line, localKey)
-			if index != -1 {
-				matches[key] = index
-			}
+		index := strings.Index(line, pattern)
+		if index != -1 {
+			matches[key] = index
 		}
 	}
 
-	firstIndex := len(line)
-	var candidate string
-	for key, value := range matches {
-		if value < firstIndex {
-			firstIndex = value
-			candidate = key
+	// find which digit pattern was the first one
+	first := len(line)
+	pattern := ""
+	for key, index := range matches {
+		if index < first {
+			first = index
+			pattern = key
 		}
 	}
 
-	_, err := strconv.Atoi(candidate)
+	// return pattern if it's a digit or find the digit using the pattern
+	_, err := strconv.Atoi(pattern)
 	if err != nil {
-		conversion, ok := patterns[candidate]
-		if !ok {
-			panic("Pattern conversion not found.")
-		}
-
-		_, err = strconv.Atoi(conversion)
-		if err != nil {
-			panic(err)
-		}
-
-		return conversion
+		digit, ok := digits[pattern]
+		return digit, ok
 	}
 
-	return candidate
+	return pattern, true
+}
+
+func digitsToValue(a, b string) int {
+	value, err := strconv.Atoi(a + b)
+	if err != nil {
+		panic(err)
+	}
+
+	return value
 }
 
 func reverseString(s string) string {

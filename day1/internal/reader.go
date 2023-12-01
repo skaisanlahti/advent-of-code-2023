@@ -7,15 +7,15 @@ import (
 )
 
 func ReadFlags() (bool, string) {
-	checkStrings := flag.Bool("s", false, "Check strings for digit values.")
+	checkStringPatterns := flag.Bool("s", false, "Check string patterns for digit values.")
 	filePath := flag.String("f", "", "Input file path.")
 	flag.Parse()
 
 	if filePath == nil {
-		panic("Usage: go run cmd/main.go -s -f=<filepath>")
+		panic("File path flag is required. Usage: -f=<filepath>")
 	}
 
-	return *checkStrings, *filePath
+	return *checkStringPatterns, *filePath
 }
 
 func ReadInputFile(filePath string) []string {
