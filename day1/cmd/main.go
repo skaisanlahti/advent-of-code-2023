@@ -9,9 +9,9 @@ import (
 
 func main() {
 	start := time.Now()
-	checkStrings, filePath := internal.ReadFlags()
+	checkStringPatterns, filePath := internal.ReadFlags()
 	input := internal.ReadInputFile(filePath)
-	result := internal.Calibrate(input, checkStrings)
+	result := internal.Calibrate(input, checkStringPatterns)
 	duration := time.Since(start).Nanoseconds()
 	log.Printf("Calibrated %s in %d ns with result %d.", filePath, duration, result)
 }
