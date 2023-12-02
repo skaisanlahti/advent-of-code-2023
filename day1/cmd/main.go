@@ -11,7 +11,7 @@ func main() {
 	start := time.Now()
 	checkStringPatterns, filePath := internal.ReadFlags()
 	input := internal.ReadInputFile(filePath)
-	result := internal.Calibrate(input, checkStringPatterns)
+	result := internal.SumCalibrationValues(input, checkStringPatterns)
 	duration := time.Since(start).Nanoseconds()
 	log.Printf("Calibrated %s in %d ns with result %d.", filePath, duration, result)
 }

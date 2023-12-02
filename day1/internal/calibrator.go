@@ -5,15 +5,16 @@ import (
 	"strings"
 )
 
-func Calibrate(input []string, checkStringPatterns bool) int {
+func SumCalibrationValues(input []string, checkStringPatterns bool) int {
 	total := 0
 	for _, line := range input {
-		firstDigit, ok := findDigit(line, checkStringPatterns, false)
+		first, ok := findDigit(line, checkStringPatterns, false)
 		if !ok {
 			continue // line contains no valid digits, skip checking in reverse order
 		}
-		lastDigit, _ := findDigit(line, checkStringPatterns, true)
-		value := digitsToValue(firstDigit, lastDigit)
+
+		last, _ := findDigit(line, checkStringPatterns, true)
+		value, _ := strconv.Atoi(first + last)
 		total += value
 	}
 
@@ -88,15 +89,6 @@ func findDigit(line string, checkStringPatterns bool, reverseOrder bool) (string
 	}
 
 	return pattern, true
-}
-
-func digitsToValue(a, b string) int {
-	value, err := strconv.Atoi(a + b)
-	if err != nil {
-		panic(err)
-	}
-
-	return value
 }
 
 func reverseString(s string) string {
