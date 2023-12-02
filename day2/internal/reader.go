@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func ReadFlags() (int, int, int, string) {
+func ReadValidatorFlags() (int, int, int, string) {
 	r := flag.Int("r", 0, "Number of red cubes.")
 	g := flag.Int("g", 0, "Number of green cubes.")
 	b := flag.Int("b", 0, "Number of blue cubes.")
@@ -19,6 +19,17 @@ func ReadFlags() (int, int, int, string) {
 	}
 
 	return *r, *g, *b, *filePath
+}
+
+func ReadCalculatorFlags() string {
+	filePath := flag.String("f", "", "Input file path.")
+	flag.Parse()
+
+	if *filePath == "" {
+		log.Fatalln("File path flag is required. Usage: -f=<filepath>")
+	}
+
+	return *filePath
 }
 
 func ReadInputFile(filePath string) []string {
