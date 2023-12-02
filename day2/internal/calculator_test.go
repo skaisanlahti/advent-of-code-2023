@@ -3,21 +3,26 @@ package internal
 import "testing"
 
 type powerCase struct {
-	filePath string
+	input    []string
 	expected int
 }
 
 var powerCases = []powerCase{
-	{"../input/sample.txt", 2286},
-	{"../input/data.txt", 83707},
+	{ReadInputFile("../input/sample.txt"), 2286},
+	{ReadInputFile("../input/data.txt"), 83707},
 }
 
 func TestSumGamePowers(t *testing.T) {
 	for i, testCase := range powerCases {
-		input := ReadInputFile(testCase.filePath)
-		result := SumGamePowers(input)
+		result := SumGamePowers(testCase.input)
 		if result != testCase.expected {
 			t.Errorf("Test case %d expected %d but result was %d.", i+1, testCase.expected, result)
 		}
+	}
+}
+
+func BenchmarkSumGamePowers(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		SumGamePowers(powerCases[1].input)
 	}
 }
