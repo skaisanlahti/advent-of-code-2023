@@ -70,12 +70,12 @@ func findDigit(line string, checkStringPatterns bool, reverseOrder bool) (string
 		}
 	}
 
-	// find which digit pattern was the first one
-	first := len(line)
+	// find which pattern had the lowest index
+	lowest := len(line)
 	pattern := ""
 	for key, index := range matches {
-		if index < first {
-			first = index
+		if index < lowest {
+			lowest = index
 			pattern = key
 		}
 	}
