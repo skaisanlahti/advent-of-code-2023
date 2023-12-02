@@ -3,6 +3,7 @@ package internal
 import (
 	"bufio"
 	"flag"
+	"log"
 	"os"
 )
 
@@ -11,8 +12,8 @@ func ReadFlags() (bool, string) {
 	filePath := flag.String("f", "", "Input file path.")
 	flag.Parse()
 
-	if filePath == nil {
-		panic("File path flag is required. Usage: -f=<filepath>")
+	if *filePath == "" {
+		log.Fatalln("File path flag is required. Usage: -f=<filepath>")
 	}
 
 	return *checkStringPatterns, *filePath
