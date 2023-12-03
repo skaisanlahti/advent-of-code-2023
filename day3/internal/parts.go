@@ -15,11 +15,11 @@ type enginePart struct {
 
 func SumPartNumbers(input []string) int {
 	schema := newSchema(input)
-	parts := parseEnginePartsWithMath(&schema)
+	parts := parsePartsWithMath(&schema)
 	return calculateNumberTotal(parts, &schema)
 }
 
-func parseEnginePartsWithRegex(input []string) []enginePart {
+func parsePartsWithRegex(input []string) []enginePart {
 	var parts []enginePart
 	for row, line := range input {
 		finder := regexp.MustCompile(`[0-9]+`)
@@ -38,7 +38,7 @@ func parseEnginePartsWithRegex(input []string) []enginePart {
 	return parts
 }
 
-func parseEnginePartsWithMath(s *schema) []enginePart {
+func parsePartsWithMath(s *schema) []enginePart {
 	var parts []enginePart
 	for row, runes := range s.content {
 		for column := 0; column < s.columns; {
@@ -74,37 +74,31 @@ func parseEnginePartsWithMath(s *schema) []enginePart {
 	return parts
 }
 
-func runeToInt(r rune) (int, bool) {
-	if r < '0' || r > '9' {
-		return 0, false
-	}
-
-	return int(r - '0'), true
-}
-
 func calculateNumberTotal(parts []enginePart, schema *schema) int {
 	total := 0
 	for _, part := range parts {
 		neighbors := findNeighbors(part, schema)
 		for _, neighbor := range neighbors {
-			if isSymbol(neighbor.symbol) {
-				total += part.number
-				break
+			if neighbor.symbol == '.' {
+				continue
 			}
+
+			if '0' <= neighbor.symbol && neighbor.symbol <= '9' {
+				continue
+			}
+
+			total += part.number
+			break
 		}
 	}
 
 	return total
 }
 
-func isSymbol(r rune) bool {
-	if r == '.' {
-		return false
+func runeToInt(r rune) (int, bool) {
+	if r < '0' || '9' < r {
+		return 0, false
 	}
 
-	if r >= '0' && r <= '9' {
-		return false
-	}
-
-	return true
+	return int(r - '0'), true
 }

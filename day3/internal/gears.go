@@ -6,7 +6,7 @@ import (
 
 func SumGearRatios(input []string) int {
 	schema := newSchema(input)
-	parts := parseEnginePartsWithMath(&schema)
+	parts := parsePartsWithMath(&schema)
 	gears := mapPartsToGears(parts, &schema)
 	return calculateGearRatios(gears)
 }
@@ -16,7 +16,7 @@ func mapPartsToGears(parts []enginePart, schema *schema) map[string][]int {
 	for _, part := range parts {
 		neighbors := findNeighbors(part, schema)
 		for _, neighbor := range neighbors {
-			if !isGearSymbol(neighbor.symbol) {
+			if neighbor.symbol != '*' {
 				continue
 			}
 
@@ -43,12 +43,4 @@ func calculateGearRatios(gears map[string][]int) int {
 	}
 
 	return total
-}
-
-func isGearSymbol(r rune) bool {
-	if r == '*' {
-		return true
-	}
-
-	return false
 }

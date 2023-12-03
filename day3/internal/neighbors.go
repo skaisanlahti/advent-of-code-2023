@@ -7,15 +7,14 @@ type neighbor struct {
 }
 
 func findNeighbors(part enginePart, schema *schema) []neighbor {
+	minRow := part.row - 1
+	maxRow := part.row + 1
+	minColumn := part.column - 1
+	maxColumn := part.column + part.length
+
 	var neighbors []neighbor
-
-	startRow := part.row - 1
-	endRow := part.row + 1
-	startColumn := part.column - 1
-	endColumn := part.column + part.length
-
-	for row := startRow; row <= endRow; row++ {
-		for column := startColumn; column <= endColumn; {
+	for row := minRow; row <= maxRow; row++ {
+		for column := minColumn; column <= maxColumn; {
 			if isDigitPosition(row, column, part) {
 				column += part.length
 				continue
@@ -34,53 +33,36 @@ func findNeighbors(part enginePart, schema *schema) []neighbor {
 
 const (
 	digitRowOk = 1 << iota
-	digitMinColumnOk
-	digitMaxColumnOk
-	digitOk = digitRowOk | digitMinColumnOk | digitMaxColumnOk
+	digitColumnOk
 )
 
 func isDigitPosition(row, column int, part enginePart) bool {
-	var checks int
+	var result int
 	if row == part.row {
-		checks |= digitRowOk
+		result |= digitRowOk
 	}
 
-	if column >= part.column {
-		checks |= digitMinColumnOk
+	if part.column <= column && column < part.column+part.length {
+		result |= digitColumnOk
 	}
 
-	if column < part.column+part.length {
-		checks |= digitMaxColumnOk
-	}
-
-	return checks == digitOk
+	return result == digitRowOk|digitColumnOk
 }
 
 const (
-	boundsMinRowOk = 1 << iota
-	boundsMaxRowMaxOk
-	boundsMinColumnOk
-	boundsMaxColumnOk
-	boundsOk = boundsMinRowOk | boundsMaxRowMaxOk | boundsMinColumnOk | boundsMaxColumnOk
+	boundsRowsOk = 1 << iota
+	boundsColumnsOk
 )
 
 func isWithinBounds(row, column int, schema *schema) bool {
-	var checks int
-	if row >= 0 {
-		checks |= boundsMinRowOk
+	var result int
+	if 0 <= row && row < schema.rows {
+		result |= boundsRowsOk
 	}
 
-	if row < schema.rows {
-		checks |= boundsMaxRowMaxOk
+	if 0 <= column && column < schema.columns {
+		result |= boundsColumnsOk
 	}
 
-	if column >= 0 {
-		checks |= boundsMinColumnOk
-	}
-
-	if column < schema.columns {
-		checks |= boundsMaxColumnOk
-	}
-
-	return checks == boundsOk
+	return result == boundsRowsOk|boundsColumnsOk
 }
