@@ -6,7 +6,7 @@ import (
 
 func SumGearRatios(input []string) int {
 	schema := newSchema(input)
-	parts := findEngineParts(input)
+	parts := parseEnginePartsWithMath(&schema)
 	gears := mapPartsToGears(parts, &schema)
 	return calculateGearRatios(gears)
 }
