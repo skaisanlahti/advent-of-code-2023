@@ -7,61 +7,80 @@ type neighbor struct {
 }
 
 func findNeighbors(p enginePart, s *schema) []neighbor {
-	row := p.row
-	column := p.column
-	length := p.length
-
-	rowCount := s.rows
-	columnCount := s.columns
-	schema := s.content
-
 	var neighbors []neighbor
 
-	// above
-	if row-1 >= 0 {
-		// left
-		if column-1 >= 0 {
-			neighbors = append(neighbors, neighbor{schema[row-1][column-1], row - 1, column - 1})
-		}
+	startRow := p.row - 1
+	endRow := p.row + 1
+	startColumn := p.column - 1
+	endColumn := p.column + p.length
 
-		// middle
-		for i, char := range schema[row-1][column : column+length] {
-			neighbors = append(neighbors, neighbor{char, row - 1, column + i})
-		}
+	for row := startRow; row <= endRow; row++ {
+		for column := startColumn; column <= endColumn; {
+			if isDigitPosition(row, column, p) {
+				column += p.length
+				continue
+			}
 
-		// right
-		if column+length < columnCount {
-			neighbors = append(neighbors, neighbor{schema[row-1][column+length], row - 1, column + length})
-		}
-	}
+			if isWithinBounds(row, column, s) {
+				neighbors = append(neighbors, neighbor{s.content[row][column], column, row})
+			}
 
-	// left
-	if column-1 >= 0 {
-		neighbors = append(neighbors, neighbor{schema[row][column-1], row, column - 1})
-	}
-
-	// right
-	if column+length < columnCount {
-		neighbors = append(neighbors, neighbor{schema[row][column+length], row, column + length})
-	}
-
-	// below
-	if row+1 < rowCount {
-		// left
-		if column-1 >= 0 {
-			neighbors = append(neighbors, neighbor{schema[row+1][column-1], row + 1, column - 1})
-		}
-
-		// middle
-		for i, char := range schema[row+1][column : column+length] {
-			neighbors = append(neighbors, neighbor{char, row + 1, column + i})
-		}
-
-		// right
-		if column+length < columnCount {
-			neighbors = append(neighbors, neighbor{schema[row+1][column+length], row + 1, column + length})
+			column++
 		}
 	}
 
 	return neighbors
+}
+
+const (
+	digitRowOk = 1 << iota
+	digitMinColumnOk
+	digitMaxColumnOk
+	digitOk = digitRowOk | digitMinColumnOk | digitMaxColumnOk
+)
+
+func isDigitPosition(row, column int, part enginePart) bool {
+	var checks int
+	if row == part.row {
+		checks |= digitRowOk
+	}
+
+	if column >= part.column {
+		checks |= digitMinColumnOk
+	}
+
+	if column < part.column+part.length {
+		checks |= digitMaxColumnOk
+	}
+
+	return checks == digitOk
+}
+
+const (
+	boundsMinRowOk = 1 << iota
+	boundsMaxRowMaxOk
+	boundsMinColumnOk
+	boundsMaxColumnOk
+	boundsOk = boundsMinRowOk | boundsMaxRowMaxOk | boundsMinColumnOk | boundsMaxColumnOk
+)
+
+func isWithinBounds(row, column int, schema *schema) bool {
+	var checks int
+	if row >= 0 {
+		checks |= boundsMinRowOk
+	}
+
+	if row < schema.rows {
+		checks |= boundsMaxRowMaxOk
+	}
+
+	if column >= 0 {
+		checks |= boundsMinColumnOk
+	}
+
+	if column < schema.columns {
+		checks |= boundsMaxColumnOk
+	}
+
+	return checks == boundsOk
 }
