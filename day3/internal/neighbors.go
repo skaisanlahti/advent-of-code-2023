@@ -1,7 +1,7 @@
 package internal
 
 type neighbor struct {
-	char   rune
+	symbol rune
 	row    int
 	column int
 }

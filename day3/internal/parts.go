@@ -87,8 +87,7 @@ func calculateNumberTotal(parts []enginePart, schema *schema) int {
 	for _, part := range parts {
 		neighbors := findNeighbors(part, schema)
 		for _, neighbor := range neighbors {
-			ok := isSymbol(neighbor.char)
-			if ok {
+			if isSymbol(neighbor.symbol) {
 				total += part.number
 				break
 			}

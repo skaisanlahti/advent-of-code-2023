@@ -16,16 +16,17 @@ func mapPartsToGears(parts []enginePart, schema *schema) map[string][]int {
 	for _, part := range parts {
 		neighbors := findNeighbors(part, schema)
 		for _, neighbor := range neighbors {
-			ok := isGear(neighbor.char)
-			if ok {
-				key := fmt.Sprintf("%d.%d", neighbor.row, neighbor.column)
-				numbers, found := gears[key]
-				if !found {
-					numbers = []int{}
-				}
-
-				gears[key] = append(numbers, part.number)
+			if !isGearSymbol(neighbor.symbol) {
+				continue
 			}
+
+			key := fmt.Sprintf("%d.%d", neighbor.row, neighbor.column)
+			numbers, ok := gears[key]
+			if !ok {
+				numbers = []int{}
+			}
+
+			gears[key] = append(numbers, part.number)
 		}
 	}
 
@@ -44,7 +45,7 @@ func calculateGearRatios(gears map[string][]int) int {
 	return total
 }
 
-func isGear(r rune) bool {
+func isGearSymbol(r rune) bool {
 	if r == '*' {
 		return true
 	}
