@@ -6,23 +6,23 @@ type neighbor struct {
 	column int
 }
 
-func findNeighbors(p enginePart, s *schema) []neighbor {
+func findNeighbors(part enginePart, schema *schema) []neighbor {
 	var neighbors []neighbor
 
-	startRow := p.row - 1
-	endRow := p.row + 1
-	startColumn := p.column - 1
-	endColumn := p.column + p.length
+	startRow := part.row - 1
+	endRow := part.row + 1
+	startColumn := part.column - 1
+	endColumn := part.column + part.length
 
 	for row := startRow; row <= endRow; row++ {
 		for column := startColumn; column <= endColumn; {
-			if isDigitPosition(row, column, p) {
-				column += p.length
+			if isDigitPosition(row, column, part) {
+				column += part.length
 				continue
 			}
 
-			if isWithinBounds(row, column, s) {
-				neighbors = append(neighbors, neighbor{s.content[row][column], column, row})
+			if isWithinBounds(row, column, schema) {
+				neighbors = append(neighbors, neighbor{schema.content[row][column], column, row})
 			}
 
 			column++
