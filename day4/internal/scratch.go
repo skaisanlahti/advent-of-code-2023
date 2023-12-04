@@ -6,11 +6,6 @@ import (
 	"github.com/skaisanlahti/advent-of-code-2023/kit"
 )
 
-type scratchCard struct {
-	wins  int
-	count int
-}
-
 func SumCardPoints(input []string) int {
 	cards := parseCards(input)
 	total := countPoints(cards)
@@ -23,8 +18,8 @@ func SumCardCount(input []string) int {
 	return total
 }
 
-func parseCards(input []string) []scratchCard {
-	var cards []scratchCard
+func parseCards(input []string) []int {
+	cards := []int{}
 	for _, line := range input {
 		numbers := strings.Split(line, ":")[1]
 		splits := strings.Split(numbers, "|")
@@ -41,18 +36,17 @@ func parseCards(input []string) []scratchCard {
 			}
 		}
 
-		card := scratchCard{wins, 1}
-		cards = append(cards, card)
+		cards = append(cards, wins)
 	}
 
 	return cards
 }
 
-func countPoints(cards []scratchCard) int {
+func countPoints(cards []int) int {
 	total := 0
-	for _, card := range cards {
+	for _, wins := range cards {
 		points := 0
-		for i := 0; i < card.wins; i++ {
+		for i := 0; i < wins; i++ {
 			switch points {
 			case 0:
 				points++
@@ -67,18 +61,55 @@ func countPoints(cards []scratchCard) int {
 	return total
 }
 
-func countCards(cards []scratchCard) int {
+func countCards(cards []int) int {
+	counts := map[int]int{}
 	total := 0
-	for index, card := range cards {
-		total += card.count
+	for index, wins := range cards {
+		counts[index] += 1
+		count := counts[index]
+		total += count
 
 		start := index + 1
-		end := start + card.wins
-		for copy := 0; copy < card.count; copy++ {
+		end := start + wins
+		for copy := 0; copy < count; copy++ {
 			for target := start; target < end; target++ {
-				cards[target].count += 1
+				counts[target] += 1
 			}
 		}
+	}
+
+	return total
+}
+
+func CountPointsSinglePass(input []string) int {
+	total := 0
+	for _, line := range input {
+		// parse numbers
+		numbers := strings.Split(line, ":")[1]
+		splits := strings.Split(numbers, "|")
+		winningNumbers := kit.NumbersFromString(splits[0])
+		scratchedNumbers := kit.NumbersFromString(splits[1])
+
+		// check wins
+		win := map[int]int{}
+		for _, number := range winningNumbers {
+			win[number] = number
+		}
+
+		points := 0
+		for _, number := range scratchedNumbers {
+			_, ok := win[number]
+			if ok {
+				switch points {
+				case 0:
+					points++
+				default:
+					points *= 2
+				}
+			}
+		}
+
+		total += points
 	}
 
 	return total

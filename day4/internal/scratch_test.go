@@ -33,6 +33,21 @@ func BenchmarkSumCardPoints(b *testing.B) {
 	}
 }
 
+func TestCountPointsSinglePass(t *testing.T) {
+	for i, testCase := range testCases[0:1] {
+		result := CountPointsSinglePass(testCase.input)
+		if result != testCase.expected {
+			t.Errorf("Test case %d expected %d but result was %d.", i+1, testCase.expected, result)
+		}
+	}
+}
+
+func BenchmarkCountPointsSinglePass(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		CountPointsSinglePass(testCases[1].input)
+	}
+}
+
 func TestSumCardCount(t *testing.T) {
 	for i, testCase := range testCases[2:3] {
 		result := SumCardCount(testCase.input)
