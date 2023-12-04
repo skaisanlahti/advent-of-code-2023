@@ -33,17 +33,17 @@ func BenchmarkCountPoints(b *testing.B) {
 	}
 }
 
-func TestCountCopies(t *testing.T) {
+func TestCountCards(t *testing.T) {
 	for i, testCase := range testCases[2:3] {
-		result := CountCopies(testCase.input)
+		result := CountCards(testCase.input)
 		if result != testCase.expected {
 			t.Errorf("Test case %d expected %d but result was %d.", i+1, testCase.expected, result)
 		}
 	}
 }
 
-func BenchmarkCountCopies(b *testing.B) {
+func BenchmarkCountCards(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		CountCopies(testCases[3].input)
+		CountCards(testCases[3].input)
 	}
 }

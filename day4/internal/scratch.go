@@ -7,19 +7,17 @@ import (
 )
 
 func CountPoints(input []string) int {
-	cards := parseCards(input)
-	total := countPoints(cards)
-	return total
+	wins := parseWinCounts(input)
+	return countPoints(wins)
 }
 
-func CountCopies(input []string) int {
-	cards := parseCards(input)
-	total := countCopies(cards)
-	return total
+func CountCards(input []string) int {
+	wins := parseWinCounts(input)
+	return countCards(wins)
 }
 
-func parseCards(input []string) []int {
-	cards := []int{} // keeps count of wins
+func parseWinCounts(input []string) []int {
+	winCounts := []int{}
 	for _, line := range input {
 		numbers := strings.Split(line, ":")[1]
 		splits := strings.Split(numbers, "|")
@@ -27,24 +25,24 @@ func parseCards(input []string) []int {
 		scratchedNumbers := kit.NumbersFromString(splits[1])
 
 		wins := 0
-		for _, scratched := range scratchedNumbers {
-			for _, winning := range winningNumbers {
-				if scratched == winning {
+		for _, scratchedNumber := range scratchedNumbers {
+			for _, winningNumber := range winningNumbers {
+				if scratchedNumber == winningNumber {
 					wins++
 					break
 				}
 			}
 		}
 
-		cards = append(cards, wins)
+		winCounts = append(winCounts, wins)
 	}
 
-	return cards
+	return winCounts
 }
 
-func countPoints(cards []int) int {
-	total := 0
-	for _, wins := range cards {
+func countPoints(winCounts []int) int {
+	totalPoints := 0
+	for _, wins := range winCounts {
 		points := 0
 		for i := 0; i < wins; i++ {
 			switch points {
@@ -55,28 +53,28 @@ func countPoints(cards []int) int {
 			}
 		}
 
-		total += points
+		totalPoints += points
 	}
 
-	return total
+	return totalPoints
 }
 
-func countCopies(cards []int) int {
-	copies := map[int]int{} // maps index to count
-	total := 0
-	for index, wins := range cards {
-		copies[index] += 1
-		count := copies[index]
-		total += count
+func countCards(winCounts []int) int {
+	cardCounts := map[int]int{}
+	totalCards := 0
+	for card, wins := range winCounts {
+		cardCounts[card] += 1
+		cardCount := cardCounts[card]
+		totalCards += cardCount
 
-		start := index + 1
+		start := card + 1
 		end := start + wins
-		for copy := 0; copy < count; copy++ {
+		for i := 0; i < cardCount; i++ {
 			for target := start; target < end; target++ {
-				copies[target] += 1
+				cardCounts[target] += 1
 			}
 		}
 	}
 
-	return total
+	return totalCards
 }
