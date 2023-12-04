@@ -47,3 +47,18 @@ func BenchmarkSumCardCount(b *testing.B) {
 		SumCardCount(testCases[3].input)
 	}
 }
+
+func TestSumCardCountSinglePass(t *testing.T) {
+	for i, testCase := range testCases[2:3] {
+		result := CountCardsSinglePass(testCase.input)
+		if result != testCase.expected {
+			t.Errorf("Test case %d expected %d but result was %d.", i+1, testCase.expected, result)
+		}
+	}
+}
+
+func BenchmarkSumCardCountSinglePass(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		CountCardsSinglePass(testCases[3].input)
+	}
+}

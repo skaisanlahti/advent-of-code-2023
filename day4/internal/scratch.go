@@ -83,3 +83,43 @@ func countCards(cards []scratchCard) int {
 
 	return total
 }
+
+func CountCardsSinglePass(input []string) int {
+	// map card index to count
+	counts := map[int]int{}
+	total := 0
+	for index, line := range input {
+		// parse numbers
+		numbers := strings.Split(line, ":")[1]
+		splits := strings.Split(numbers, "|")
+		winningNumbers := kit.NumbersFromString(splits[0])
+		scratchedNumbers := kit.NumbersFromString(splits[1])
+
+		// check wins
+		wins := 0
+		for _, scratched := range scratchedNumbers {
+			for _, winning := range winningNumbers {
+				if scratched == winning {
+					wins++
+					break
+				}
+			}
+		}
+
+		// count copies
+		counts[index] += 1
+		count := counts[index]
+		total += count
+
+		// add copies of further cards based on wins
+		start := index + 1
+		end := start + wins
+		for copy := 0; copy < count; copy++ {
+			for target := start; target < end; target++ {
+				counts[target] += 1
+			}
+		}
+	}
+
+	return total
+}
