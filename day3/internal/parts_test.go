@@ -1,6 +1,10 @@
 package internal
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/skaisanlahti/advent-of-code-2023/kit"
+)
 
 type partCase struct {
 	input    []string
@@ -8,8 +12,8 @@ type partCase struct {
 }
 
 var partCases = []partCase{
-	{ReadInputFile("../input/sample.txt"), 4361},
-	{ReadInputFile("../input/data.txt"), 525119},
+	{kit.ReadInputFile("../input/sample.txt"), 4361},
+	{kit.ReadInputFile("../input/data.txt"), 525119},
 }
 
 func TestSumEnginePartNumbers(t *testing.T) {

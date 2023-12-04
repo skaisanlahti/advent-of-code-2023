@@ -1,4 +1,4 @@
-package internal
+package kit
 
 import (
 	"bufio"
@@ -7,21 +7,7 @@ import (
 	"os"
 )
 
-func ReadValidatorFlags() (int, int, int, string) {
-	r := flag.Int("r", 0, "Number of red cubes.")
-	g := flag.Int("g", 0, "Number of green cubes.")
-	b := flag.Int("b", 0, "Number of blue cubes.")
-	filePath := flag.String("f", "", "Input file path.")
-	flag.Parse()
-
-	if *filePath == "" {
-		log.Fatalln("File path flag is required. Usage: -f=<filepath>")
-	}
-
-	return *r, *g, *b, *filePath
-}
-
-func ReadCalculatorFlags() string {
+func ReadFileFlag() string {
 	filePath := flag.String("f", "", "Input file path.")
 	flag.Parse()
 

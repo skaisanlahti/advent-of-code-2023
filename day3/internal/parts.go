@@ -4,6 +4,8 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+
+	"github.com/skaisanlahti/advent-of-code-2023/kit"
 )
 
 type enginePart struct {
@@ -42,7 +44,7 @@ func parsePartsWithMath(s *schema) []enginePart {
 	var parts []enginePart
 	for row, runes := range s.content {
 		for column := 0; column < s.columns; {
-			digit, ok := runeToInt(runes[column])
+			digit, ok := kit.RuneToInt(runes[column])
 			if !ok {
 				column++
 				continue
@@ -50,7 +52,7 @@ func parsePartsWithMath(s *schema) []enginePart {
 
 			digits := []int{digit}
 			for next := column + 1; next < s.columns; next++ {
-				digit, ok := runeToInt(runes[next])
+				digit, ok := kit.RuneToInt(runes[next])
 				if !ok {
 					break
 				}
@@ -93,12 +95,4 @@ func calculateNumberTotal(parts []enginePart, schema *schema) int {
 	}
 
 	return total
-}
-
-func runeToInt(r rune) (int, bool) {
-	if r < '0' || '9' < r {
-		return 0, false
-	}
-
-	return int(r - '0'), true
 }

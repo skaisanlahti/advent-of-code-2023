@@ -1,6 +1,10 @@
 package internal
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/skaisanlahti/advent-of-code-2023/kit"
+)
 
 type powerCase struct {
 	input    []string
@@ -8,8 +12,8 @@ type powerCase struct {
 }
 
 var powerCases = []powerCase{
-	{ReadInputFile("../input/sample.txt"), 2286},
-	{ReadInputFile("../input/data.txt"), 83707},
+	{kit.ReadInputFile("../input/sample.txt"), 2286},
+	{kit.ReadInputFile("../input/data.txt"), 83707},
 }
 
 func TestSumGamePowers(t *testing.T) {

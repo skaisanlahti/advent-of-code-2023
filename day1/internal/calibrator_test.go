@@ -1,6 +1,10 @@
 package internal
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/skaisanlahti/advent-of-code-2023/kit"
+)
 
 type testCase struct {
 	input               []string
@@ -9,11 +13,11 @@ type testCase struct {
 }
 
 var testCases = []testCase{
-	{ReadInputFile("../input/sample1.txt"), false, 142},
-	{ReadInputFile("../input/sample2.txt"), true, 281},
-	{ReadInputFile("../input/sample3.txt"), true, 292},
-	{ReadInputFile("../input/data.txt"), false, 56049},
-	{ReadInputFile("../input/data.txt"), true, 54530},
+	{kit.ReadInputFile("../input/sample1.txt"), false, 142},
+	{kit.ReadInputFile("../input/sample2.txt"), true, 281},
+	{kit.ReadInputFile("../input/sample3.txt"), true, 292},
+	{kit.ReadInputFile("../input/data.txt"), false, 56049},
+	{kit.ReadInputFile("../input/data.txt"), true, 54530},
 }
 
 func TestSumCalibrationValues(t *testing.T) {

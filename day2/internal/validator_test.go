@@ -1,6 +1,10 @@
 package internal
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/skaisanlahti/advent-of-code-2023/kit"
+)
 
 type validateCase struct {
 	input    []string
@@ -11,8 +15,8 @@ type validateCase struct {
 }
 
 var validateCases = []validateCase{
-	{ReadInputFile("../input/sample.txt"), 12, 13, 14, 8},
-	{ReadInputFile("../input/data.txt"), 12, 13, 14, 2685},
+	{kit.ReadInputFile("../input/sample.txt"), 12, 13, 14, 8},
+	{kit.ReadInputFile("../input/data.txt"), 12, 13, 14, 2685},
 }
 
 func TestSumValidGameIds(t *testing.T) {

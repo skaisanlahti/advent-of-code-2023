@@ -1,6 +1,10 @@
 package internal
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/skaisanlahti/advent-of-code-2023/kit"
+)
 
 type gearCase struct {
 	input    []string
@@ -8,8 +12,8 @@ type gearCase struct {
 }
 
 var gearCases = []gearCase{
-	{ReadInputFile("../input/sample.txt"), 467835},
-	{ReadInputFile("../input/data.txt"), 76504829},
+	{kit.ReadInputFile("../input/sample.txt"), 467835},
+	{kit.ReadInputFile("../input/data.txt"), 76504829},
 }
 
 func TestSumGearRatios(t *testing.T) {

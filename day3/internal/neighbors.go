@@ -15,12 +15,18 @@ func findNeighbors(part enginePart, schema *schema) []neighbor {
 	var neighbors []neighbor
 	for row := minRow; row <= maxRow; row++ {
 		for column := minColumn; column <= maxColumn; {
-			if isDigitPosition(row, column, part) {
+			// skip digit indexes
+			rowMatch := row == part.row
+			columnMatch := part.column <= column && column < part.column+part.length
+			if rowMatch && columnMatch {
 				column += part.length
 				continue
 			}
 
-			if isWithinBounds(row, column, schema) {
+			// check bounds
+			rowInBounds := 0 <= row && row < schema.rows
+			columnInBounds := 0 <= column && column < schema.columns
+			if rowInBounds && columnInBounds {
 				neighbors = append(neighbors, neighbor{schema.content[row][column], column, row})
 			}
 
@@ -29,40 +35,4 @@ func findNeighbors(part enginePart, schema *schema) []neighbor {
 	}
 
 	return neighbors
-}
-
-const (
-	digitRowOk = 1 << iota
-	digitColumnOk
-)
-
-func isDigitPosition(row, column int, part enginePart) bool {
-	var result int
-	if row == part.row {
-		result |= digitRowOk
-	}
-
-	if part.column <= column && column < part.column+part.length {
-		result |= digitColumnOk
-	}
-
-	return result == digitRowOk|digitColumnOk
-}
-
-const (
-	boundsRowsOk = 1 << iota
-	boundsColumnsOk
-)
-
-func isWithinBounds(row, column int, schema *schema) bool {
-	var result int
-	if 0 <= row && row < schema.rows {
-		result |= boundsRowsOk
-	}
-
-	if 0 <= column && column < schema.columns {
-		result |= boundsColumnsOk
-	}
-
-	return result == boundsRowsOk|boundsColumnsOk
 }
