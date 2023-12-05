@@ -1,0 +1,8 @@
+seeds
+soil
+fertilizer
+water
+light
+temperature
+humidity
+location
