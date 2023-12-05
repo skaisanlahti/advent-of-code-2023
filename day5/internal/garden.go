@@ -36,10 +36,10 @@ func FindLowestLocationValue(input []string) int {
 		nextValues := []int{}
 		for _, value := range values {
 			processed := false
-			for _, transformation := range stage {
-				destination := transformation[0]
-				source := transformation[1]
-				length := transformation[2]
+			for _, t := range stage {
+				destination := t[0]
+				source := t[1]
+				length := t[2]
 
 				// if value is in the transformation range apply changes and break
 				if source <= value && value < source+length {
@@ -100,26 +100,25 @@ func FindLowestLocationValueInRange(input []string) int {
 		// transform values from values to nextValues set
 		nextValues := [][]int{}
 		for len(values) > 0 {
-			// take out value from values
+			// take out value range from values
 			value := values[0]
 			values = values[1:]
-
 			start := value[0]
 			end := value[1]
 			processed := false
-			for _, transformation := range stage {
-				destination := transformation[0]
-				source := transformation[1]
-				length := transformation[2]
+			for _, t := range stage {
+				destination := t[0]
+				source := t[1]
+				length := t[2]
 
 				// check which parts of the range overlap with transformation range
 				overlapStart := math.Max(float64(start), float64(source))
 				overlapEnd := math.Min(float64(end), float64(source+length))
 				if overlapStart < overlapEnd {
-					// apply offset to the overlapping part
-					offset := destination - source
-					nextStart := int(overlapStart) + offset
-					nextEnd := int(overlapEnd) + offset
+					// apply transformation to the overlapping part
+					transformation := destination - source
+					nextStart := int(overlapStart) + transformation
+					nextEnd := int(overlapEnd) + transformation
 					nextValues = append(nextValues, []int{nextStart, nextEnd})
 
 					// add values that didn't overlap with this transformation range back to values
@@ -150,7 +149,8 @@ func FindLowestLocationValueInRange(input []string) int {
 
 	found := math.MaxInt
 	for _, value := range values {
-		found = int(math.Min(float64(found), float64(value[0])))
+		start := value[0] // start of range is the lowest value
+		found = int(math.Min(float64(found), float64(start)))
 	}
 
 	return found
