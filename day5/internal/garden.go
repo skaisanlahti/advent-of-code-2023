@@ -7,50 +7,50 @@ import (
 	"github.com/skaisanlahti/advent-of-code-2023/kit"
 )
 
+type Mapper struct {
+	destination int
+	source      int
+	length      int
+}
+
 func FindLowestLocationValue(input []string) int {
-	seeds := []int{}
-	stages := [][][]int{}
+	values := []int{}
+	stages := [][]Mapper{}
 	stageIndex := -1
 	for i, line := range input {
 		if i == 0 {
-			seeds = kit.NumbersFromString(line)
+			seeds := kit.NumbersFromString(line)
+			values = seeds
 			continue
 		}
 
 		if strings.Contains(line, ":") {
 			stageIndex++
-			stages = append(stages, [][]int{})
+			stages = append(stages, []Mapper{})
 			continue
 		}
 
-		numbers := kit.NumbersFromString(line)
-		if len(numbers) > 0 {
-			transformation := stages[stageIndex]
-			transformation = append(transformation, numbers)
-			stages[stageIndex] = transformation
+		mapper := kit.NumbersFromString(line)
+		if len(mapper) > 0 {
+			mappers := stages[stageIndex]
+			mappers = append(mappers, Mapper{mapper[0], mapper[1], mapper[2]})
+			stages[stageIndex] = mappers
 		}
 	}
 
-	values := seeds
-	for _, stage := range stages {
+	for _, mappers := range stages {
 		nextValues := []int{}
 		for _, value := range values {
 			processed := false
-			for _, t := range stage {
-				destination := t[0]
-				source := t[1]
-				length := t[2]
-
-				// if value is in the transformation range apply changes and break
-				if source <= value && value < source+length {
-					nextValue := value + destination - source
+			for _, mapper := range mappers {
+				if mapper.source <= value && value < mapper.source+mapper.length {
+					nextValue := value + mapper.destination - mapper.source
 					nextValues = append(nextValues, nextValue)
 					processed = true
 					break
 				}
 			}
 
-			// value wasn't transformed, add to next stage without changes
 			if !processed {
 				nextValues = append(nextValues, value)
 			}
@@ -67,90 +67,78 @@ func FindLowestLocationValue(input []string) int {
 	return found
 }
 
-func FindLowestLocationValueInRange(input []string) int {
-	seeds := [][]int{}    // start end
-	stages := [][][]int{} // destination source length
+type ValueRange struct {
+	start int
+	end   int
+}
+
+func FindLowestLocationRange(input []string) int {
+	valueRanges := []ValueRange{}
+	stages := [][]Mapper{}
 	stageIndex := -1
 	for i, line := range input {
 		if i == 0 {
-			numbers := kit.NumbersFromString(line)
-			for i := 0; i < len(numbers); i += 2 {
-				seeds = append(seeds, []int{numbers[i], numbers[i] + numbers[i+1]})
+			seedRanges := kit.NumbersFromString(line)
+			for i := 0; i < len(seedRanges); i += 2 {
+				start := seedRanges[i]
+				end := seedRanges[i] + seedRanges[i+1]
+				valueRanges = append(valueRanges, ValueRange{start, end})
 			}
 			continue
 		}
 
 		if strings.Contains(line, ":") {
 			stageIndex++
-			stages = append(stages, [][]int{})
+			stages = append(stages, []Mapper{})
 			continue
 		}
 
-		numbers := kit.NumbersFromString(line)
-		if len(numbers) > 0 {
-			transformation := stages[stageIndex]
-			transformation = append(transformation, numbers)
-			stages[stageIndex] = transformation
+		mapper := kit.NumbersFromString(line)
+		if len(mapper) > 0 {
+			mappers := stages[stageIndex]
+			mappers = append(mappers, Mapper{mapper[0], mapper[1], mapper[2]})
+			stages[stageIndex] = mappers
 		}
 	}
 
-	values := seeds // working set
-	// handle one transformation stage at a time
-	for _, stage := range stages {
-		// transform values from values to nextValues set
-		nextValues := [][]int{}
-		for len(values) > 0 {
-			// take out value range from values
-			value := values[0]
-			values = values[1:]
-			start := value[0]
-			end := value[1]
+	for _, mappers := range stages {
+		nextValueRanges := []ValueRange{}
+		for len(valueRanges) > 0 {
+			valueRange := valueRanges[0]
+			valueRanges = valueRanges[1:]
 			processed := false
-			for _, t := range stage {
-				destination := t[0]
-				source := t[1]
-				length := t[2]
-
-				// check which parts of the range overlap with transformation range
-				overlapStart := math.Max(float64(start), float64(source))
-				overlapEnd := math.Min(float64(end), float64(source+length))
+			for _, mapper := range mappers {
+				overlapStart := int(math.Max(float64(valueRange.start), float64(mapper.source)))
+				overlapEnd := int(math.Min(float64(valueRange.end), float64(mapper.source+mapper.length)))
 				if overlapStart < overlapEnd {
-					// apply transformation to the overlapping part
-					transformation := destination - source
-					nextStart := int(overlapStart) + transformation
-					nextEnd := int(overlapEnd) + transformation
-					nextValues = append(nextValues, []int{nextStart, nextEnd})
+					nextStart := overlapStart + mapper.destination - mapper.source
+					nextEnd := overlapEnd + mapper.destination - mapper.source
+					nextValueRanges = append(nextValueRanges, ValueRange{nextStart, nextEnd})
 
-					// add values that didn't overlap with this transformation range back to values
-					// to check if they overlap with over transformation ranges
-					if int(overlapStart) > start {
-						values = append(values, []int{start, int(overlapStart)})
-					}
-					if end > int(overlapEnd) {
-						values = append(values, []int{int(overlapEnd), end})
+					if overlapStart > valueRange.start {
+						valueRanges = append(valueRanges, ValueRange{valueRange.start, overlapStart})
 					}
 
-					// values only need to be processed once so break to skip rest of ranges
+					if valueRange.end > overlapEnd {
+						valueRanges = append(valueRanges, ValueRange{overlapEnd, valueRange.end})
+					}
+
 					processed = true
 					break
 				}
 			}
 
-			// range didn't overlap with anything, add to next stage
 			if !processed {
-				nextValues = append(nextValues, []int{start, end})
+				nextValueRanges = append(nextValueRanges, valueRange)
 			}
 		}
 
-		// all values have been transformed, assign to values again for next stage
-		// as we loop to the next block of transformations
-		values = nextValues
+		valueRanges = nextValueRanges
 	}
 
 	found := math.MaxInt
-	for _, value := range values {
-		start := value[0] // start of range is the lowest value
-		found = int(math.Min(float64(found), float64(start)))
+	for _, valueRange := range valueRanges {
+		found = int(math.Min(float64(found), float64(valueRange.start)))
 	}
 
 	return found
