@@ -1,0 +1,29 @@
+version: "3"
+
+tasks:
+  test:
+    cmds:
+      - go test ./...
+
+  sample1:
+    cmds:
+      - go run cmd/part1/main.go -f=input/sample.txt
+
+  part1:
+    cmds:
+      - go run cmd/part1/main.go -f=input/data.txt
+
+  sample2:
+    cmds:
+      - go run cmd/part2/main.go -f=input/sample.txt
+
+  part2:
+    cmds:
+      - go run cmd/part2/main.go -f=input/data.txt
+
+  all:
+    cmds:
+      - task sample1
+      - task part1
+      - task sample2
+      - task part2
