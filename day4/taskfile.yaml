@@ -7,19 +7,19 @@ tasks:
 
   sample1:
     cmds:
-      - go run cmd/points/main.go -f=input/sample.txt
+      - go run part1/main.go -f=input/sample.txt
 
   part1:
     cmds:
-      - go run cmd/points/main.go -f=input/data.txt
+      - go run part1/main.go -f=input/data.txt
 
   sample2:
     cmds:
-      - go run cmd/copies/main.go -f=input/sample.txt
+      - go run part2/main.go -f=input/sample.txt
 
   part2:
     cmds:
-      - go run cmd/copies/main.go -f=input/data.txt
+      - go run part2/main.go -f=input/data.txt
 
   all:
     cmds:

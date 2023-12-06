@@ -5,17 +5,25 @@ tasks:
     cmds:
       - go test ./...
 
+  sample1:
+    cmds:
+      - go run part1/main.go -r=12 -g=13 -b=14 -f=input/sample.txt
+
   part1:
     cmds:
-      - go run cmd/validate/main.go -r=12 -g=13 -b=14 -f=input/sample.txt
-      - go run cmd/validate/main.go -r=12 -g=13 -b=14 -f=input/data.txt
+      - go run part1/main.go -r=12 -g=13 -b=14 -f=input/data.txt
+
+  sample2:
+    cmds:
+      - go run part2/main.go -f=input/sample.txt
 
   part2:
     cmds:
-      - go run cmd/calculate/main.go -f=input/sample.txt
-      - go run cmd/calculate/main.go -f=input/data.txt
+      - go run part2/main.go -f=input/data.txt
 
   all:
     cmds:
+      - task sample1
       - task part1
+      - task sample2
       - task part2
