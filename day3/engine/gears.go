@@ -11,22 +11,22 @@ func SumGearRatios(input []string) int {
 	return calculateGearRatios(gears)
 }
 
-func mapPartsToGears(parts []enginePart, schema *schema) map[string][]int {
+func mapPartsToGears(parts []EnginePart, schema *Schema) map[string][]int {
 	gears := map[string][]int{}
 	for _, part := range parts {
 		neighbors := findNeighbors(part, schema)
 		for _, neighbor := range neighbors {
-			if neighbor.symbol != '*' {
+			if neighbor.Symbol != '*' {
 				continue
 			}
 
-			key := fmt.Sprintf("%d.%d", neighbor.row, neighbor.column)
+			key := fmt.Sprintf("%d.%d", neighbor.Row, neighbor.Column)
 			numbers, ok := gears[key]
 			if !ok {
 				numbers = []int{}
 			}
 
-			gears[key] = append(numbers, part.number)
+			gears[key] = append(numbers, part.Number)
 		}
 	}
 

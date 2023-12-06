@@ -7,44 +7,16 @@ import (
 	"github.com/skaisanlahti/advent-of-code-2023/kit"
 )
 
-type Mapper struct {
-	destination int
-	source      int
-	length      int
-}
-
 func FindLowestLocationValue(input []string) int {
-	values := []int{}
-	stages := [][]Mapper{}
-	stageIndex := -1
-	for i, line := range input {
-		if i == 0 {
-			seeds := kit.NumbersFromString(line)
-			values = seeds
-			continue
-		}
-
-		if strings.Contains(line, ":") {
-			stageIndex++
-			stages = append(stages, []Mapper{})
-			continue
-		}
-
-		mapper := kit.NumbersFromString(line)
-		if len(mapper) > 0 {
-			mappers := stages[stageIndex]
-			mappers = append(mappers, Mapper{mapper[0], mapper[1], mapper[2]})
-			stages[stageIndex] = mappers
-		}
-	}
-
+	values := kit.NumbersFromString(input[0])
+	stages := parseMappingStages(input[1:])
 	for _, mappers := range stages {
 		nextValues := []int{}
 		for _, value := range values {
 			processed := false
 			for _, mapper := range mappers {
-				if mapper.source <= value && value < mapper.source+mapper.length {
-					nextValue := value + mapper.destination - mapper.source
+				if mapper.Source <= value && value < mapper.Source+mapper.Length {
+					nextValue := value + mapper.Destination - mapper.Source
 					nextValues = append(nextValues, nextValue)
 					processed = true
 					break
@@ -68,39 +40,20 @@ func FindLowestLocationValue(input []string) int {
 }
 
 type ValueRange struct {
-	start int
-	end   int
+	Start int
+	End   int
 }
 
 func FindLowestLocationRange(input []string) int {
 	valueRanges := []ValueRange{}
-	stages := [][]Mapper{}
-	stageIndex := -1
-	for i, line := range input {
-		if i == 0 {
-			seedRanges := kit.NumbersFromString(line)
-			for i := 0; i < len(seedRanges); i += 2 {
-				start := seedRanges[i]
-				end := seedRanges[i] + seedRanges[i+1]
-				valueRanges = append(valueRanges, ValueRange{start, end})
-			}
-			continue
-		}
-
-		if strings.Contains(line, ":") {
-			stageIndex++
-			stages = append(stages, []Mapper{})
-			continue
-		}
-
-		mapper := kit.NumbersFromString(line)
-		if len(mapper) > 0 {
-			mappers := stages[stageIndex]
-			mappers = append(mappers, Mapper{mapper[0], mapper[1], mapper[2]})
-			stages[stageIndex] = mappers
-		}
+	seedRanges := kit.NumbersFromString(input[0])
+	for i := 0; i < len(seedRanges); i += 2 {
+		start := seedRanges[i]
+		end := seedRanges[i] + seedRanges[i+1]
+		valueRanges = append(valueRanges, ValueRange{start, end})
 	}
 
+	stages := parseMappingStages(input[1:])
 	for _, mappers := range stages {
 		nextValueRanges := []ValueRange{}
 		for len(valueRanges) > 0 {
@@ -108,19 +61,19 @@ func FindLowestLocationRange(input []string) int {
 			valueRanges = valueRanges[1:]
 			processed := false
 			for _, mapper := range mappers {
-				overlapStart := int(math.Max(float64(valueRange.start), float64(mapper.source)))
-				overlapEnd := int(math.Min(float64(valueRange.end), float64(mapper.source+mapper.length)))
+				overlapStart := int(math.Max(float64(valueRange.Start), float64(mapper.Source)))
+				overlapEnd := int(math.Min(float64(valueRange.End), float64(mapper.Source+mapper.Length)))
 				if overlapStart < overlapEnd {
-					nextStart := overlapStart + mapper.destination - mapper.source
-					nextEnd := overlapEnd + mapper.destination - mapper.source
+					nextStart := overlapStart + mapper.Destination - mapper.Source
+					nextEnd := overlapEnd + mapper.Destination - mapper.Source
 					nextValueRanges = append(nextValueRanges, ValueRange{nextStart, nextEnd})
 
-					if overlapStart > valueRange.start {
-						valueRanges = append(valueRanges, ValueRange{valueRange.start, overlapStart})
+					if overlapStart > valueRange.Start {
+						valueRanges = append(valueRanges, ValueRange{valueRange.Start, overlapStart})
 					}
 
-					if valueRange.end > overlapEnd {
-						valueRanges = append(valueRanges, ValueRange{overlapEnd, valueRange.end})
+					if valueRange.End > overlapEnd {
+						valueRanges = append(valueRanges, ValueRange{overlapEnd, valueRange.End})
 					}
 
 					processed = true
@@ -138,8 +91,35 @@ func FindLowestLocationRange(input []string) int {
 
 	found := math.MaxInt
 	for _, valueRange := range valueRanges {
-		found = int(math.Min(float64(found), float64(valueRange.start)))
+		found = int(math.Min(float64(found), float64(valueRange.Start)))
 	}
 
 	return found
+}
+
+type Mapper struct {
+	Destination int
+	Source      int
+	Length      int
+}
+
+func parseMappingStages(input []string) [][]Mapper {
+	stages := [][]Mapper{}
+	stageIndex := -1
+	for _, line := range input {
+		if strings.Contains(line, ":") {
+			stageIndex++
+			stages = append(stages, []Mapper{})
+			continue
+		}
+
+		mapper := kit.NumbersFromString(line)
+		if len(mapper) > 0 {
+			mappers := stages[stageIndex]
+			mappers = append(mappers, Mapper{mapper[0], mapper[1], mapper[2]})
+			stages[stageIndex] = mappers
+		}
+	}
+
+	return stages
 }

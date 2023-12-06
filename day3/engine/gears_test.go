@@ -6,27 +6,27 @@ import (
 	"github.com/skaisanlahti/advent-of-code-2023/kit"
 )
 
-type gearCase struct {
-	input    []string
-	expected int
+type TestSumGearRatiosData struct {
+	Input    []string
+	Expected int
 }
 
-var gearCases = []gearCase{
+var testSumGearRatiosData = []TestSumGearRatiosData{
 	{kit.ReadInputFile("../input/sample.txt"), 467835},
 	{kit.ReadInputFile("../input/data.txt"), 76504829},
 }
 
 func TestSumGearRatios(t *testing.T) {
-	for i, testCase := range gearCases {
-		result := SumGearRatios(testCase.input)
-		if result != testCase.expected {
-			t.Errorf("Test case %d expected %d but result was %d.", i+1, testCase.expected, result)
+	for i, data := range testSumGearRatiosData {
+		result := SumGearRatios(data.Input)
+		if result != data.Expected {
+			t.Errorf("Test case %d expected %d but result was %d.", i+1, data.Expected, result)
 		}
 	}
 }
 
 func BenchmarkSumGearRatios(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		SumGearRatios(gearCases[1].input)
+		SumGearRatios(testSumGearRatiosData[1].Input)
 	}
 }

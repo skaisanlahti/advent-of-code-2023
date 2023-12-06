@@ -6,27 +6,27 @@ import (
 	"github.com/skaisanlahti/advent-of-code-2023/kit"
 )
 
-type partCase struct {
-	input    []string
-	expected int
+type TestSumEnginePartNumbersData struct {
+	Input    []string
+	Expected int
 }
 
-var partCases = []partCase{
+var testSumEnginePartNumbersData = []TestSumEnginePartNumbersData{
 	{kit.ReadInputFile("../input/sample.txt"), 4361},
 	{kit.ReadInputFile("../input/data.txt"), 525119},
 }
 
 func TestSumEnginePartNumbers(t *testing.T) {
-	for i, testCase := range partCases {
-		result := SumPartNumbers(testCase.input)
-		if result != testCase.expected {
-			t.Errorf("Test case %d expected %d but result was %d.", i+1, testCase.expected, result)
+	for i, data := range testSumEnginePartNumbersData {
+		result := SumPartNumbers(data.Input)
+		if result != data.Expected {
+			t.Errorf("Test case %d expected %d but result was %d.", i+1, data.Expected, result)
 		}
 	}
 }
 
 func BenchmarkSumEnginePartNumbers(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		SumPartNumbers(partCases[1].input)
+		SumPartNumbers(testSumEnginePartNumbersData[1].Input)
 	}
 }

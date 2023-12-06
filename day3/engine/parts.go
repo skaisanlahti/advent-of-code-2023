@@ -8,11 +8,11 @@ import (
 	"github.com/skaisanlahti/advent-of-code-2023/kit"
 )
 
-type enginePart struct {
-	number int
-	row    int
-	column int
-	length int
+type EnginePart struct {
+	Number int
+	Row    int
+	Column int
+	Length int
 }
 
 func SumPartNumbers(input []string) int {
@@ -21,8 +21,8 @@ func SumPartNumbers(input []string) int {
 	return calculateNumberTotal(parts, &schema)
 }
 
-func parsePartsWithRegex(input []string) []enginePart {
-	var parts []enginePart
+func parsePartsWithRegex(input []string) []EnginePart {
+	var parts []EnginePart
 	for row, line := range input {
 		finder := regexp.MustCompile(`[0-9]+`)
 		partStrings := finder.FindAllString(line, -1)
@@ -32,7 +32,7 @@ func parsePartsWithRegex(input []string) []enginePart {
 			number, _ := strconv.Atoi(partString)
 			column := partStringIndexes[i][0]
 			length := len([]rune(partString))
-			part := enginePart{number, row, column, length}
+			part := EnginePart{number, row, column, length}
 			parts = append(parts, part)
 		}
 	}
@@ -40,10 +40,10 @@ func parsePartsWithRegex(input []string) []enginePart {
 	return parts
 }
 
-func parsePartsWithMath(s *schema) []enginePart {
-	var parts []enginePart
-	for row, runes := range s.content {
-		for column := 0; column < s.columns; {
+func parsePartsWithMath(s *Schema) []EnginePart {
+	var parts []EnginePart
+	for row, runes := range s.Content {
+		for column := 0; column < s.Columns; {
 			digit, ok := kit.RuneToInt(runes[column])
 			if !ok {
 				column++
@@ -51,7 +51,7 @@ func parsePartsWithMath(s *schema) []enginePart {
 			}
 
 			digits := []int{digit}
-			for next := column + 1; next < s.columns; next++ {
+			for next := column + 1; next < s.Columns; next++ {
 				digit, ok := kit.RuneToInt(runes[next])
 				if !ok {
 					break
@@ -66,7 +66,7 @@ func parsePartsWithMath(s *schema) []enginePart {
 				number += digits[i] * int(math.Pow10(m))
 			}
 
-			part := enginePart{number, row, column, length}
+			part := EnginePart{number, row, column, length}
 			parts = append(parts, part)
 
 			column += length
@@ -76,20 +76,20 @@ func parsePartsWithMath(s *schema) []enginePart {
 	return parts
 }
 
-func calculateNumberTotal(parts []enginePart, schema *schema) int {
+func calculateNumberTotal(parts []EnginePart, schema *Schema) int {
 	total := 0
 	for _, part := range parts {
 		neighbors := findNeighbors(part, schema)
 		for _, neighbor := range neighbors {
-			if neighbor.symbol == '.' {
+			if neighbor.Symbol == '.' {
 				continue
 			}
 
-			if '0' <= neighbor.symbol && neighbor.symbol <= '9' {
+			if '0' <= neighbor.Symbol && neighbor.Symbol <= '9' {
 				continue
 			}
 
-			total += part.number
+			total += part.Number
 			break
 		}
 	}

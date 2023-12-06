@@ -1,33 +1,33 @@
 package engine
 
-type neighbor struct {
-	symbol rune
-	row    int
-	column int
+type Neighbor struct {
+	Symbol rune
+	Row    int
+	Column int
 }
 
-func findNeighbors(part enginePart, schema *schema) []neighbor {
-	minRow := part.row - 1
-	maxRow := part.row + 1
-	minColumn := part.column - 1
-	maxColumn := part.column + part.length
+func findNeighbors(part EnginePart, schema *Schema) []Neighbor {
+	minRow := part.Row - 1
+	maxRow := part.Row + 1
+	minColumn := part.Column - 1
+	maxColumn := part.Column + part.Length
 
-	var neighbors []neighbor
+	neighbors := []Neighbor{}
 	for row := minRow; row <= maxRow; row++ {
 		for column := minColumn; column <= maxColumn; {
 			// skip digit indexes
-			rowMatch := row == part.row
-			columnMatch := part.column <= column && column < part.column+part.length
+			rowMatch := row == part.Row
+			columnMatch := part.Column <= column && column < part.Column+part.Length
 			if rowMatch && columnMatch {
-				column += part.length
+				column += part.Length
 				continue
 			}
 
 			// check bounds
-			rowInBounds := 0 <= row && row < schema.rows
-			columnInBounds := 0 <= column && column < schema.columns
+			rowInBounds := 0 <= row && row < schema.Rows
+			columnInBounds := 0 <= column && column < schema.Columns
 			if rowInBounds && columnInBounds {
-				neighbors = append(neighbors, neighbor{schema.content[row][column], column, row})
+				neighbors = append(neighbors, Neighbor{schema.Content[row][column], column, row})
 			}
 
 			column++

@@ -8,8 +8,8 @@ import (
 )
 
 type Race struct {
-	time   int
-	record int
+	Time   int
+	Record int
 }
 
 func RaceSetMarginProduct(input []string) int {
@@ -50,9 +50,9 @@ func marginsProduct(races []Race) int {
 
 func bruteForceMargin(race Race) int {
 	margin := 0
-	for hold := 0; hold < race.time; hold++ {
-		distance := (race.time - hold) * hold
-		if distance > race.record {
+	for hold := 0; hold < race.Time; hold++ {
+		distance := (race.Time - hold) * hold
+		if distance > race.Record {
 			margin++
 		}
 	}
@@ -62,18 +62,18 @@ func bruteForceMargin(race Race) int {
 
 func findMarginBounds(race Race) int {
 	start := 0
-	for hold := 0; hold < race.time; hold++ {
-		distance := (race.time - hold) * hold
-		if distance > race.record {
+	for hold := 0; hold < race.Time; hold++ {
+		distance := (race.Time - hold) * hold
+		if distance > race.Record {
 			start = hold
 			break
 		}
 	}
 
 	end := 0
-	for hold := race.time; hold > 0; hold-- {
-		distance := (race.time - hold) * hold
-		if distance > race.record {
+	for hold := race.Time; hold > 0; hold-- {
+		distance := (race.Time - hold) * hold
+		if distance > race.Record {
 			end = hold
 			break
 		}
@@ -83,7 +83,7 @@ func findMarginBounds(race Race) int {
 }
 
 func calculateMargin(race Race) int {
-	root1, root2, err := kit.QuadraticRoots(-1, float64(race.time), -float64(race.record))
+	root1, root2, err := kit.QuadraticRoots(-1, float64(race.Time), -float64(race.Record))
 	if err != nil {
 		return 0
 	}
@@ -108,15 +108,15 @@ func calculateMargin(race Race) int {
 
 func ternarySearchMargin(race Race) int {
 	distance := func(hold float64) float64 {
-		return (hold * (float64(race.time) - hold))
+		return (hold * (float64(race.Time) - hold))
 	}
 
-	middle := int(math.RoundToEven(kit.TernarySearch(distance, 0, float64(race.time), 1e2)))
+	middle := int(math.RoundToEven(kit.TernarySearch(distance, 0, float64(race.Time), 1e2)))
 	s, e := middle, middle
-	for int(distance(float64(s))) > race.record {
+	for int(distance(float64(s))) > race.Record {
 		s--
 	}
-	for int(distance(float64(e))) > race.record {
+	for int(distance(float64(e))) > race.Record {
 		e++
 	}
 

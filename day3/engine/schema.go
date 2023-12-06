@@ -1,17 +1,17 @@
 package engine
 
-type schema struct {
-	rows    int
-	columns int
-	content [][]rune
+type Schema struct {
+	Rows    int
+	Columns int
+	Content [][]rune
 }
 
-func newSchema(input []string) schema {
-	var content [][]rune
+func newSchema(input []string) Schema {
+	content := [][]rune{}
 	for _, line := range input {
 		runes := []rune(line)
 		content = append(content, runes)
 	}
 
-	return schema{len(content), len(content[0]), content}
+	return Schema{len(content), len(content[0]), content}
 }
