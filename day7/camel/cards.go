@@ -27,28 +27,28 @@ const (
 	Nothing      string = "Nothing"
 )
 
-var Evaluations = map[string]int{
-	FiveOfAKind:  7,
-	FourOfAKind:  6,
-	FullHouse:    5,
-	ThreeOfAKind: 4,
-	TwoPairs:     3,
-	OnePair:      2,
-	HighCard:     1,
-	Nothing:      0,
+var HandValues = map[string]int{
+	FiveOfAKind:  6,
+	FourOfAKind:  5,
+	FullHouse:    4,
+	ThreeOfAKind: 3,
+	TwoPairs:     2,
+	OnePair:      1,
+	HighCard:     0,
 }
 
 type Hand struct {
 	Cards      string
 	Bid        int
-	Evaluation int
+	HandValue  int
+	CardValues []int
 }
 
 func CountWinnings(input []string, useJokers bool) int {
-	evalute := evaluateHand
+	evaluate := evaluateHand
 	if useJokers {
 		FaceCardValues['J'] = 1
-		evalute = evaluateHandWithJokers
+		evaluate = evaluateHandWithJokers
 	}
 
 	hands := []Hand{}
@@ -56,8 +56,8 @@ func CountWinnings(input []string, useJokers bool) int {
 		splits := strings.Split(line, " ")
 		cards := splits[0]
 		bid, _ := strconv.Atoi(splits[1])
-		eval := evalute(cards)
-		hands = append(hands, Hand{cards, bid, eval})
+		handValue, cardValues := evaluate(cards)
+		hands = append(hands, Hand{cards, bid, handValue, cardValues})
 	}
 
 	slices.SortFunc(hands, compareHands)
@@ -67,11 +67,13 @@ func CountWinnings(input []string, useJokers bool) int {
 		rank := i + 1
 		total += rank * hand.Bid
 	}
+
 	return total
 }
 
-func countOccurances(cards string) map[rune]int {
+func countsAndValues(cards string) (map[rune]int, []int) {
 	counts := map[rune]int{}
+	values := []int{}
 	for _, card := range cards {
 		count, ok := counts[card]
 		if !ok {
@@ -79,13 +81,19 @@ func countOccurances(cards string) map[rune]int {
 		} else {
 			counts[card] = count + 1
 		}
+
+		value, ok := kit.RuneToInt(card)
+		if !ok {
+			value = FaceCardValues[card]
+		}
+		values = append(values, value)
 	}
 
-	return counts
+	return counts, values
 }
 
-func evaluateHand(cards string) int {
-	counts := countOccurances(cards)
+func evaluateHand(cards string) (int, []int) {
+	counts, values := countsAndValues(cards)
 	kinds, pairs := 0, 0
 	for _, count := range counts {
 		if kinds < count {
@@ -97,26 +105,29 @@ func evaluateHand(cards string) int {
 		}
 	}
 
+	eval := 0
 	switch {
 	case kinds == 5:
-		return Evaluations[FiveOfAKind]
+		eval = HandValues[FiveOfAKind]
 	case kinds == 4:
-		return Evaluations[FourOfAKind]
+		eval = HandValues[FourOfAKind]
 	case kinds == 3 && pairs == 1:
-		return Evaluations[FullHouse]
+		eval = HandValues[FullHouse]
 	case kinds == 3:
-		return Evaluations[ThreeOfAKind]
+		eval = HandValues[ThreeOfAKind]
 	case pairs == 2:
-		return Evaluations[TwoPairs]
+		eval = HandValues[TwoPairs]
 	case pairs == 1:
-		return Evaluations[OnePair]
+		eval = HandValues[OnePair]
 	default:
-		return Evaluations[HighCard]
+		eval = HandValues[HighCard]
 	}
+
+	return eval, values
 }
 
-func evaluateHandWithJokers(cards string) int {
-	counts := countOccurances(cards)
+func evaluateHandWithJokers(cards string) (int, []int) {
+	counts, values := countsAndValues(cards)
 	kinds, pairs, jokers := 0, 0, 0
 	for key, count := range counts {
 		if key == 'J' {
@@ -133,43 +144,35 @@ func evaluateHandWithJokers(cards string) int {
 		}
 	}
 
+	eval := 0
 	switch {
 	case kinds+jokers == 5:
-		return Evaluations[FiveOfAKind]
+		eval = HandValues[FiveOfAKind]
 	case kinds+jokers == 4:
-		return Evaluations[FourOfAKind]
+		eval = HandValues[FourOfAKind]
 	case kinds == 3 && pairs == 1, kinds == 3 && jokers == 1, pairs == 2 && jokers == 1, pairs == 1 && jokers >= 2:
-		return Evaluations[FullHouse]
+		eval = HandValues[FullHouse]
 	case kinds+jokers == 3, kinds == 2 && jokers >= 1:
-		return Evaluations[ThreeOfAKind]
+		eval = HandValues[ThreeOfAKind]
 	case pairs == 2, pairs == 1 && jokers == 1:
-		return Evaluations[TwoPairs]
+		eval = HandValues[TwoPairs]
 	case pairs == 1, pairs == 0 && jokers == 1:
-		return Evaluations[OnePair]
+		eval = HandValues[OnePair]
 	default:
-		return Evaluations[HighCard]
-	}
-}
-
-func evaluateCard(card rune) int {
-	value, ok := kit.RuneToInt(card)
-	if !ok {
-		value = FaceCardValues[card]
+		eval = HandValues[HighCard]
 	}
 
-	return value
+	return eval, values
 }
 
 func compareHands(a, b Hand) int {
-	if a.Evaluation != b.Evaluation {
-		return a.Evaluation - b.Evaluation
+	if a.HandValue != b.HandValue {
+		return a.HandValue - b.HandValue
 	}
 
-	acards := []rune(a.Cards)
-	bcards := []rune(b.Cards)
-	for i := 0; i < len(a.Cards); i++ {
-		avalue := evaluateCard(acards[i])
-		bvalue := evaluateCard(bcards[i])
+	for i := 0; i < len(a.CardValues); i++ {
+		avalue := a.CardValues[i]
+		bvalue := b.CardValues[i]
 		if avalue != bvalue {
 			return avalue - bvalue
 		}
