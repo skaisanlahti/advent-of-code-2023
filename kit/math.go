@@ -23,3 +23,17 @@ func QuadraticRootsComplex(a, b, c float64) (complex128, complex128) {
 	root2 := (-complex(b, 0) - discriminant) / complex(2*a, 0)
 	return root1, root2
 }
+
+func GreatestCommonDivisor(a, b int) int {
+	for b != 0 {
+		temp := b
+		b = a % b
+		a = temp
+	}
+	return a
+}
+
+func LowestCommonMultiple(a, b int) int {
+	d := GreatestCommonDivisor(a, b)
+	return a * b / d
+}
