@@ -14,9 +14,8 @@ type Node struct {
 
 func CountSteps(input []string) int {
 	instructions := []rune(input[0])
-	nodeStrings := input[2:]
 	nodes := map[string]Node{}
-	for _, line := range nodeStrings {
+	for _, line := range input[2:] {
 		cleanLine := strings.ReplaceAll(strings.ReplaceAll(line, "(", ""), ")", "")
 		parts := strings.Split(cleanLine, " = ")
 		id := parts[0]
@@ -33,9 +32,7 @@ func CountSteps(input []string) int {
 	stepsTaken := 0
 	currentNode := nodes["AAA"]
 	for currentNode.Id != "ZZZ" {
-		direction := instructions[instructionIndex]
-
-		switch direction {
+		switch instructions[instructionIndex] {
 		case 'L':
 			currentNode = nodes[currentNode.Left]
 		case 'R':
@@ -54,10 +51,9 @@ func CountSteps(input []string) int {
 
 func CountStepCycles(input []string) int {
 	instructions := []rune(input[0])
-	nodeStrings := input[2:]
 	nodes := map[string]Node{}
 	currentNodes := []Node{}
-	for _, line := range nodeStrings {
+	for _, line := range input[2:] {
 		cleanLine := strings.ReplaceAll(strings.ReplaceAll(line, "(", ""), ")", "")
 		parts := strings.Split(cleanLine, " = ")
 		id := parts[0]
@@ -87,14 +83,12 @@ func CountStepCycles(input []string) int {
 			nextNodes = append(nextNodes, current)
 		}
 
-		direction := instructions[instructionIndex]
 		for i := 0; i < len(nextNodes); i++ {
-			current := nextNodes[i]
-			switch direction {
+			switch instructions[instructionIndex] {
 			case 'L':
-				nextNodes[i] = nodes[current.Left]
+				nextNodes[i] = nodes[nextNodes[i].Left]
 			case 'R':
-				nextNodes[i] = nodes[current.Right]
+				nextNodes[i] = nodes[nextNodes[i].Right]
 			}
 		}
 
