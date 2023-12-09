@@ -14,9 +14,24 @@ type Node struct {
 
 func CountSteps(input []string) int {
 	instructions := []rune(input[0])
+	nodes := parseNodes(input[2:])
+	steps := countStepsTaken(instructions, nodes)
+	return steps
+}
+
+func CountStepCycles(input []string) int {
+	instructions := []rune(input[0])
+	nodes := parseNodes(input[2:])
+	pathLengths := findPathLengths(instructions, nodes)
+	steps := countStepsNeeded(pathLengths)
+	return steps
+}
+
+func parseNodes(lines []string) map[string]Node {
 	nodes := map[string]Node{}
-	for _, line := range input[2:] {
-		cleanLine := strings.ReplaceAll(strings.ReplaceAll(line, "(", ""), ")", "")
+	for _, line := range lines {
+		cleanLeft := strings.ReplaceAll(line, "(", "")
+		cleanLine := strings.ReplaceAll(cleanLeft, ")", "")
 		parts := strings.Split(cleanLine, " = ")
 		id := parts[0]
 		directions := parts[1]
@@ -27,12 +42,15 @@ func CountSteps(input []string) int {
 		nodes[id] = node
 	}
 
-	instructionsLength := len(instructions)
-	instructionIndex := 0
+	return nodes
+}
+
+func countStepsTaken(instructions []rune, nodes map[string]Node) int {
+	instruction := 0
 	stepsTaken := 0
 	currentNode := nodes["AAA"]
 	for currentNode.Id != "ZZZ" {
-		switch instructions[instructionIndex] {
+		switch instructions[instruction] {
 		case 'L':
 			currentNode = nodes[currentNode.Left]
 		case 'R':
@@ -40,36 +58,29 @@ func CountSteps(input []string) int {
 		}
 
 		stepsTaken++
-		instructionIndex++
-		if instructionIndex == instructionsLength {
-			instructionIndex = 0
+		instruction++
+		if instruction == len(instructions) {
+			instruction = 0
 		}
 	}
 
 	return stepsTaken
 }
 
-func CountStepCycles(input []string) int {
-	instructions := []rune(input[0])
-	nodes := map[string]Node{}
-	currentNodes := []Node{}
-	for _, line := range input[2:] {
-		cleanLine := strings.ReplaceAll(strings.ReplaceAll(line, "(", ""), ")", "")
-		parts := strings.Split(cleanLine, " = ")
-		id := parts[0]
-		directions := parts[1]
-		parts = strings.Split(directions, ", ")
-		left := parts[0]
-		right := parts[1]
-		node := Node{id, left, right}
-		nodes[id] = node
+func startNodes(nodes map[string]Node) []Node {
+	startNodes := []Node{}
+	for _, node := range nodes {
 		if node.Id[2] == 'A' {
-			currentNodes = append(currentNodes, node)
+			startNodes = append(startNodes, node)
 		}
 	}
 
-	instructionsLength := len(instructions)
-	instructionIndex := 0
+	return startNodes
+}
+
+func findPathLengths(instructions []rune, nodes map[string]Node) []int {
+	currentNodes := startNodes(nodes)
+	instruction := 0
 	stepsTaken := 0
 	pathLengths := []int{}
 	for len(currentNodes) > 0 {
@@ -84,7 +95,7 @@ func CountStepCycles(input []string) int {
 		}
 
 		for i := 0; i < len(nextNodes); i++ {
-			switch instructions[instructionIndex] {
+			switch instructions[instruction] {
 			case 'L':
 				nextNodes[i] = nodes[nextNodes[i].Left]
 			case 'R':
@@ -93,14 +104,18 @@ func CountStepCycles(input []string) int {
 		}
 
 		stepsTaken++
-		instructionIndex++
-		if instructionIndex == instructionsLength {
-			instructionIndex = 0
+		instruction++
+		if instruction == len(instructions) {
+			instruction = 0
 		}
 
 		currentNodes = nextNodes
 	}
 
+	return pathLengths
+}
+
+func countStepsNeeded(pathLengths []int) int {
 	stepsNeeded := pathLengths[0]
 	for i := 1; i < len(pathLengths); i++ {
 		stepsNeeded = kit.LowestCommonMultiple(stepsNeeded, pathLengths[i])
