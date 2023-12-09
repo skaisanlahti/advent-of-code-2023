@@ -3,6 +3,8 @@ package trebuchet
 import (
 	"strconv"
 	"strings"
+
+	"github.com/skaisanlahti/advent-of-code-2023/kit"
 )
 
 func SumCalibrationValues(input []string, checkStringPatterns bool) int {
@@ -36,7 +38,7 @@ var digits = map[string]string{
 func findDigit(line string, checkStringPatterns bool, reverseOrder bool) (string, bool) {
 	// find digit either from start or end of line
 	if reverseOrder {
-		line = reverseString(line)
+		line = kit.ReverseString(line)
 	}
 
 	// find digit based on number value
@@ -62,7 +64,7 @@ func findDigit(line string, checkStringPatterns bool, reverseOrder bool) (string
 	for key := range digits {
 		pattern := key
 		if reverseOrder {
-			pattern = reverseString(key)
+			pattern = kit.ReverseString(key)
 		}
 
 		index := strings.Index(line, pattern)
@@ -89,13 +91,4 @@ func findDigit(line string, checkStringPatterns bool, reverseOrder bool) (string
 	}
 
 	return pattern, true
-}
-
-func reverseString(s string) string {
-	runes := []rune(s)
-	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
-		runes[i], runes[j] = runes[j], runes[i]
-	}
-
-	return string(runes)
 }

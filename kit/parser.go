@@ -8,7 +8,7 @@ func NumbersFromString(line string) []int {
 }
 
 func NumbersFromRunes(runes []rune) []int {
-	var numbers []int
+	numbers := []int{}
 	for i := 0; i < len(runes); {
 		digit, ok := RuneToInt(runes[i])
 		if !ok {

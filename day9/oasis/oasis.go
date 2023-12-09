@@ -10,13 +10,14 @@ import (
 func PredictNextValue(input []string, reverse bool) int {
 	histories := parseHistories(input)
 	if reverse {
-		histories = reverseHistories(histories)
+		for _, history := range histories {
+			kit.ReverseInts(history)
+		}
 	}
 
 	sum := 0
 	for _, history := range histories {
-		prediction := extrapolate(history)
-		sum += prediction
+		sum += recursiveExtrapolate(history)
 	}
 
 	return sum
@@ -47,31 +48,48 @@ func isFinal(history []int) bool {
 	for i := 0; i < len(history); i++ {
 		if history[i] != 0 {
 			isFinal = false
+			break
 		}
 	}
 
 	return isFinal
 }
 
-func extrapolate(history []int) int {
+func recursiveExtrapolate(history []int) int {
 	if isFinal(history) {
 		return 0
 	}
 
-	differences := []int{}
+	deltas := []int{}
 	for i := 1; i < len(history); i++ {
-		differences = append(differences, history[i]-history[i-1])
+		deltas = append(deltas, history[i]-history[i-1])
 	}
 
-	next := extrapolate(differences)
-	return history[len(history)-1] + next
+	return history[len(history)-1] + recursiveExtrapolate(deltas)
 }
 
-func reverseHistories(histories [][]int) [][]int {
-	reversed := [][]int{}
-	for _, history := range histories {
-		reversed = append(reversed, kit.ReverseSlice(history))
+func loopExtrapolate(history []int) int {
+	current := history
+	values := [][]int{current}
+	for !isFinal(current) {
+		deltas := []int{}
+		for i := 1; i < len(current); i++ {
+			deltas = append(deltas, current[i]-current[i-1])
+		}
+
+		values = append(values, deltas)
+		current = deltas
 	}
 
-	return reversed
+	current = append(current, 0)
+	values[len(values)-1] = current
+
+	for i := len(values) - 2; i >= 0; i-- {
+		this := values[i]
+		last := values[i+1]
+		this = append(this, this[len(this)-1]+last[len(last)-1])
+		values[i] = this
+	}
+
+	return values[0][len(values[0])-1]
 }
