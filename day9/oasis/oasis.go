@@ -73,6 +73,5 @@ func reverseHistories(histories [][]int) [][]int {
 		reversed = append(reversed, kit.ReverseSlice(history))
 	}
 
-	histories = reversed
 	return reversed
 }
